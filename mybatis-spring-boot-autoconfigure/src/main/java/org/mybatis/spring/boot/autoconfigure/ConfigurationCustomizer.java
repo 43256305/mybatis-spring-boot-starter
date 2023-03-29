@@ -23,6 +23,8 @@ import org.apache.ibatis.session.Configuration;
  * @author Kazuki Shimizu
  *
  * @since 1.2.1
+ *
+ * xjh-自定义Configuration接口，我们可以通过实现此接口来自定义Configuration中的一些属性
  */
 @FunctionalInterface
 public interface ConfigurationCustomizer {

@@ -23,6 +23,8 @@ import org.mybatis.spring.SqlSessionFactoryBean;
  * @author Kazuki Shimizu
  *
  * @since 2.2.2
+ *
+ * xjh-自定义SqlSessionFactoryBean接口，我们可以通过实现此接口来自定义SqlSessionFactoryBean中的一些属性，如插件、别名等
  */
 @FunctionalInterface
 public interface SqlSessionFactoryBeanCustomizer {

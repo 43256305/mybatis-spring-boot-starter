@@ -28,6 +28,8 @@ import org.springframework.boot.sql.init.dependency.DependsOnDatabaseInitializat
  * @author Eddú Meléndez
  *
  * @since 2.3.0
+ *
+ * xjh-确保SqlSessionTemplate类bean的初始化晚于datasource。
  */
 class MybatisDependsOnDatabaseInitializationDetector
     extends AbstractBeansOfTypeDependsOnDatabaseInitializationDetector {

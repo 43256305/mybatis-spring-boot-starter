@@ -79,11 +79,17 @@ import org.springframework.util.StringUtils;
  * @author Josh Long
  * @author Kazuki Shimizu
  * @author Eduardo Macarrón
+ *
+ * xjh-mybatis融入SpringBoot的自动配置类
+ * 注入了三个类：SqlSessionFactory、SqlSessionTemplate、MapperScannerConfigurer
+ * 注入了一个配置类：MybatisProperties
+ * 创建Configuration与SqlSessionFactory于时对这两个对象增加了自定义操作：SqlSessionFactoryBeanCustomizer与ConfigurationCustomizer
+ *
  */
 @org.springframework.context.annotation.Configuration
 @ConditionalOnClass({ SqlSessionFactory.class, SqlSessionFactoryBean.class })
 @ConditionalOnSingleCandidate(DataSource.class)
-@EnableConfigurationProperties(MybatisProperties.class)
+@EnableConfigurationProperties(MybatisProperties.class)  // 将MybatisProperties注入到context中
 @AutoConfigureAfter({ DataSourceAutoConfiguration.class, MybatisLanguageDriverAutoConfiguration.class })
 public class MybatisAutoConfiguration implements InitializingBean {
 
@@ -105,6 +111,9 @@ public class MybatisAutoConfiguration implements InitializingBean {
 
   private final List<SqlSessionFactoryBeanCustomizer> sqlSessionFactoryBeanCustomizers;
 
+//  xjh-注意这个构造器。这里注入了MybatisProperties，另外还是用了大量的ObjectProvider。
+//  ObjectProvider用于解决构造器的循环依赖问题，并且ObjectProvider还可以用于注入集合类型的bean。例如，如果有多个实现了同一接口的bean，我们可以使用ObjectProvider来注入一个包含所有实现类实例的集合，而不是注入一个单独的实例。
+//  所以，只要我们的context中包含了Interceptor的实例，这些实例都会加入到此类的interceptors属性中
   public MybatisAutoConfiguration(MybatisProperties properties, ObjectProvider<Interceptor[]> interceptorsProvider,
       ObjectProvider<TypeHandler[]> typeHandlersProvider, ObjectProvider<LanguageDriver[]> languageDriversProvider,
       ResourceLoader resourceLoader, ObjectProvider<DatabaseIdProvider> databaseIdProvider,
@@ -142,6 +151,8 @@ public class MybatisAutoConfiguration implements InitializingBean {
     if (StringUtils.hasText(this.properties.getConfigLocation())) {
       factory.setConfigLocation(this.resourceLoader.getResource(this.properties.getConfigLocation()));
     }
+    // 生成Configuration
+    // xjh-调用ConfigurationCustomizer，自定义configuration
     applyConfiguration(factory);
     if (this.properties.getConfigurationProperties() != null) {
       factory.setConfigurationProperties(this.properties.getConfigurationProperties());
@@ -183,7 +194,9 @@ public class MybatisAutoConfiguration implements InitializingBean {
       // Need to mybatis-spring 2.0.2+
       factory.setDefaultScriptingLanguageDriver(defaultLanguageDriver);
     }
+    // xjh-调用SqlSessionFactoryBeanCustomizer，自定义对factory
     applySqlSessionFactoryBeanCustomizers(factory);
+    // 注意，这里会调用SqlSessionFactoryBean.afterPropertiesSet()方法，用于初始化sqlSessionFactory与解析xml文件
     return factory.getObject();
   }
 

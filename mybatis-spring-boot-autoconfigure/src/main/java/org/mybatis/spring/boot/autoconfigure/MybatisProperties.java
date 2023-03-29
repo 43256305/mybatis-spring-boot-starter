@@ -34,6 +34,10 @@ import org.springframework.core.io.support.ResourcePatternResolver;
  *
  * @author Eddú Meléndez
  * @author Kazuki Shimizu
+ *
+ * xjh-MyBatis 的配置类，可以配置mybatis-config.xml，mapper.xml、别名、executorType等。
+ * 前缀为：mybatis
+ * 仅仅使用此注解并不能将此类注入到context中，需要结合@EnableConfigurationProperties或者@Component使用
  */
 @ConfigurationProperties(prefix = MybatisProperties.MYBATIS_PREFIX)
 public class MybatisProperties {
